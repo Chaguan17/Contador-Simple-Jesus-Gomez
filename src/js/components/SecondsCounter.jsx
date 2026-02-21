@@ -1,21 +1,22 @@
 import React from "react";
 
-const SecondsCounter = (props) => {
-  const secondsString = props.seconds.toString().padStart(5, "0");
-
+function SecondsCounter({ digit6, digit5, digit4, digit3, digit2, digit1 }) {
   return (
     <div className="counter-container">
+
       <div className="digit clock">
         🕗
       </div>
 
-      {secondsString.split("").map((num, index) => (
-        <div key={index} className="digit">
-          {num}
-        </div>
-      ))}
+      <div className="digit">{digit6 % 10}</div>
+      <div className="digit">{digit5 % 10}</div>
+      <div className="digit">{digit4 % 10}</div>
+      <div className="digit">{digit3 % 10}</div>
+      <div className="digit">{digit2 % 10}</div>
+      <div className="digit">{digit1 % 10}</div>
+
     </div>
   );
-};
+}
 
 export default SecondsCounter;

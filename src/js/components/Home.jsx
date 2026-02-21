@@ -1,119 +1,111 @@
-import React, { Component } from "react";
+import React from "react";
+import ReactDOM from "react-dom/client";
 import SecondsCounter from "./SecondsCounter";
 
-class Home extends Component {
-  constructor(props) {
-    super(props);
+let counter = 0;
+let interval = null;
+let alertTime = null;
+let isCountingDown = false;
 
-    this.state = {
-      counter: 0,
-      isRunning: false,
-      alertTime: null
-    };
-  }
+const root = ReactDOM.createRoot(document.getElementById("root"));
 
-  componentWillUnmount() {
-    clearInterval(this.interval);
-  }
+function render() {
+  const seis = Math.floor(counter / 100000) % 10;
+  const cinco = Math.floor(counter / 10000) % 10;
+  const cuatro = Math.floor(counter / 1000) % 10;
+  const tres = Math.floor(counter / 100) % 10;
+  const dos = Math.floor(counter / 10) % 10;
+  const uno = Math.floor(counter / 1) % 10;
 
-  startCountUp = () => {
-    clearInterval(this.interval);
+  root.render(
+    <div>
+      <SecondsCounter
+        digit6={seis}
+        digit5={cinco}
+        digit4={cuatro}
+        digit3={tres}
+        digit2={dos}
+        digit1={uno}
+      />
 
-    this.setState({ isRunning: true });
-
-    this.interval = setInterval(() => {
-      this.setState({
-        counter: this.state.counter + 1
-      });
-
-      if (this.state.counter === parseInt(this.state.alertTime)) {
-        alert("¡Tiempo alcanzado!");
-      }
-
-    }, 1000);
-  };
-
-  startCountDown = () => {
-    clearInterval(this.interval);
-
-    this.setState({ isRunning: true });
-
-    this.interval = setInterval(() => {
-
-      if (this.state.counter > 0) {
-        this.setState({
-          counter: this.state.counter - 1
-        });
-      } else {
-        clearInterval(this.interval);
-      }
-
-      if (this.state.counter === parseInt(this.state.alertTime)) {
-        alert("¡Tiempo alcanzado!");
-      }
-
-    }, 1000);
-  };
-
-  stopCounter = () => {
-    clearInterval(this.interval);
-    this.setState({ isRunning: false });
-  };
-
-  resetCounter = () => {
-    clearInterval(this.interval);
-    this.setState({
-      counter: 0,
-      isRunning: false
-    });
-  };
-
-  handleInputChange = (e) => {
-    this.setState({
-      counter: parseInt(e.target.value) || 0
-    });
-  };
-
-  handleAlertChange = (e) => {
-    this.setState({
-      alertTime: e.target.value
-    });
-  };
-
-  render() {
-    return (
-      <div className="text-center">
-
-        <h2>Contador</h2>
-
-        <SecondsCounter seconds={this.state.counter} />
-
-        <br />
+      <div style={{ textAlign: "center", marginTop: "20px" }}>
 
         <input
           type="number"
           placeholder="Número inicial"
-          onChange={this.handleInputChange}
+          onChange={(e) => counter = parseInt(e.target.value) || 0}
         />
-
-        <br /><br />
 
         <input
           type="number"
           placeholder="Alerta en..."
-          onChange={this.handleAlertChange}
+          onChange={(e) => alertTime = parseInt(e.target.value)}
         />
 
         <br /><br />
 
-        <button onClick={this.startCountUp}>Iniciar</button>
-        <button onClick={this.startCountDown}>Cuenta regresiva</button>
-        <button onClick={this.stopCounter}>Parar</button>
-        <button onClick={this.resetCounter}>Reiniciar</button>
+        <button onClick={startUp}>Iniciar</button>
+        <button onClick={startDown}>Cuenta regresiva</button>
+        <button onClick={stop}>Parar</button>
+        <button onClick={resume}>Resumir</button>
+        <button onClick={reset}>Reiniciar</button>
 
       </div>
-    );
+    </div>
+  );
+}
+
+function startUp() {
+  clearInterval(interval);
+  isCountingDown = false;
+
+  interval = setInterval(() => {
+    counter++;
+
+    checkAlert();
+    render();
+  }, 1000);
+}
+
+function startDown() {
+  clearInterval(interval);
+  isCountingDown = true;
+
+  interval = setInterval(() => {
+    if (counter >= 1) {
+      counter--;
+    } else {
+      clearInterval(interval);
+    }
+
+    checkAlert();
+    render();
+  }, 1000);
+}
+
+function stop() {
+  clearInterval(interval);
+}
+
+function resume() {
+  if (isCountingDown) {
+    startDown();
+  } else {
+    startUp();
   }
 }
 
+function reset() {
+  clearInterval(interval);
+  counter = 0;
+  render();
+}
+
+function checkAlert() {
+  if (alertTime !== null && counter === alertTime) {
+    alert("⏰ ¡Tiempo alcanzado!");
+  }
+}
+
+render();
 export default Home;
